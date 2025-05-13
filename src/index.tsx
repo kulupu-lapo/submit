@@ -15,61 +15,65 @@ app.get("/", (c) => {
 });
 
 app.get("/api/submit", async (c) => {
-  const body = await c.req.parseBody();
-  const repo = c.env.GITHUB_REPO;
-  const token = c.env.GITHUB_TOKEN;
+  try {
+    const body = await c.req.parseBody();
+    const repo = c.env.GITHUB_REPO;
+    const token = c.env.GITHUB_TOKEN;
 
-  const branch = `testing-${Date.now()}`;
-  const filePath = `plaintext/${branch}.yaml`;
+    const branch = `testing-${Date.now()}`;
+    const filePath = `plaintext/${branch}.yaml`;
 
-  const headers = {
-    Authorization: `token ${token}`,
-    Accept: "application/vnd.github.v3+json",
-    "Content-Type": "application/json",
-  };
+    const headers = {
+      Authorization: `token ${token}`,
+      Accept: "application/vnd.github.v3+json",
+      "Content-Type": "application/json",
+    };
 
-  // Get default branch SHA
-  const baseRes = await fetch(
-    `https://api.github.com/repos/${repo}/git/ref/heads/main`,
-    { headers },
-  );
-  const baseData = await baseRes.json();
-  const baseSha = baseData.object.sha;
+    // Get default branch SHA
+    const baseRes = await fetch(
+      `https://api.github.com/repos/${repo}/git/ref/heads/main`,
+      { headers },
+    );
+    const baseData = await baseRes.json();
+    const baseSha = baseData.object.sha;
 
-  // Create new branch
-  await fetch(`https://api.github.com/repos/${repo}/git/refs`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      ref: `refs/heads/${branch}`,
-      sha: baseSha,
-    }),
-  });
+    // Create new branch
+    await fetch(`https://api.github.com/repos/${repo}/git/refs`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        ref: `refs/heads/${branch}`,
+        sha: baseSha,
+      }),
+    });
 
-  // Create file in new branch
-  await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
-    method: "PUT",
-    headers,
-    body: JSON.stringify({
-      message: `Add YAML submission ${branch}`,
-      content: "test", // btoa(unescape(encodeURIComponent(yamlContent))),
-      branch,
-    }),
-  });
+    // Create file in new branch
+    await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify({
+        message: `Add YAML submission ${branch}`,
+        content: "test", // btoa(unescape(encodeURIComponent(yamlContent))),
+        branch,
+      }),
+    });
 
-  // Create Pull Request
-  const prRes = await fetch(`https://api.github.com/repos/${repo}/pulls`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      title: `Form submission ${branch}`,
-      head: branch,
-      base: "main",
-      body: "Automatically generated from form submission.",
-    }),
-  });
+    // Create Pull Request
+    const prRes = await fetch(`https://api.github.com/repos/${repo}/pulls`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        title: `Form submission ${branch}`,
+        head: branch,
+        base: "main",
+        body: "Automatically generated from form submission.",
+      }),
+    });
 
-  return c.json(prRes.json());
+    return c.json({ success: true, data: prRes.json() });
+  } catch (e) {
+    return c.json({ success: false, data: e });
+  }
 });
 
 export default app;
