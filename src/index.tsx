@@ -72,7 +72,7 @@ app.get("/api/submit", async (c) => {
 
     return c.json({ success: true, data: prRes.json() });
   } catch (e) {
-    return c.json({ success: false, data: e });
+    return c.json({ success: false, data: JSON.stringify(e) });
   }
 });
 
