@@ -20,6 +20,9 @@ app.onError((err: Error & { status?: StatusCode }, c) => {
     {
       ok: false as const,
       message: err.message,
+      stack: err.stack,
+      status: err.status,
+      cause: err.cause,
     },
     err.status ?? 500,
   );
