@@ -16,6 +16,6 @@ app.get("/", (c) => {
 
 app.get("/api/submit", async (c) => {
   const body = await c.req.parseBody();
-  return {success: true, repo: c.env.GITHUB_REPO}
+  return {success: true, repo: c.env.GITHUB_REPO};
 
 export default app;
