@@ -37,6 +37,8 @@ app.get("/api/submit", async (c) => {
     const baseData = await baseRes.json();
     const baseSha = baseData.object.sha;
 
+    return c.json({ success: true, data: baseSha });
+
     // Create new branch
     await fetch(`https://api.github.com/repos/${repo}/git/refs`, {
       method: "POST",
