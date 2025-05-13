@@ -16,6 +16,7 @@ app.get("/", (c) => {
 
 app.get("/api/submit", async (c) => {
   const body = await c.req.parseBody();
+  const repo = c.env.GITHUB_REPO;
   const token = c.env.GITHUB_TOKEN;
 
   const branch = `testing-${Date.now()}`;
