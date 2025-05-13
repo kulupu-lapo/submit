@@ -1,12 +1,21 @@
 import { Hono } from "hono";
 import { renderer } from "./renderer";
 
+import { logger } from "hono/logger";
+import { prettyJSON } from "hono/pretty-json";
+import { secureHeaders } from "hono/secure-headers";
+import { trimTrailingSlash } from "hono/trailing-slash";
+
 type EnvI = {
   GITHUB_REPO: string;
   GITHUB_TOKEN: string;
 };
 
-const app = new Hono();
+const app = new Hono()
+  .use("*", secureHeaders())
+  .use("*", prettyJSON())
+  .use("*", trimTrailingSlash())
+  .use("*", logger());
 
 app.use(renderer);
 
