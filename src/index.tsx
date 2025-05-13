@@ -33,8 +33,6 @@ app.get("/api/submit", async (c) => {
   const branch = `testing-${Date.now()}`;
   const filePath = `plaintext/${branch}.yaml`;
 
-  return c.json({ success: true, data: [repo, filePath] });
-
   const headers = {
     Authorization: `token ${token}`,
     Accept: "application/vnd.github.v3+json",
@@ -48,6 +46,8 @@ app.get("/api/submit", async (c) => {
   );
   const baseData = await baseRes.json();
   const baseSha = baseData.object.sha;
+
+  return c.json({ success: true, data: baseSha });
 
   // Create new branch
   await fetch(`https://api.github.com/repos/${repo}/git/refs`, {
