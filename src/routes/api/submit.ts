@@ -68,7 +68,7 @@ app.post("/", async (c) => {
       branch: `submission-${Date.now()}`,
       title: `[submission] from ${dataPR["submitted-by"]}: ${frontmatter.title}`,
       filePath: filepath,
-      content: `${yaml.dump(frontmatter)}---\n\n${dataPR.text}`,
+      content: `---\n${yaml.dump(frontmatter)}---\n\n${dataPR.text}`,
       dryRun: false,
     }),
   });
