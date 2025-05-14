@@ -60,8 +60,6 @@ app.get("/api/submit", async (c) => {
   const repoFullName = env.GITHUB_REPO ?? process.env.GITHUB_REPO; // e.g. "youruser/yourrepo"
   const token = env.GITHUB_TOKEN ?? process.env.GITHUB_TOKEN;
 
-  return c.json({ repo: repoFullName, token: token.slice(0, 4) });
-
   const [owner, repo] = repoFullName.split("/");
   const branch = `submission-${Date.now()}`;
   const filePath = `submissions/${branch}.yaml`;
@@ -77,6 +75,8 @@ app.get("/api/submit", async (c) => {
   });
 
   const baseSha = refData.object.sha;
+
+  return c.json({ sha: baseSha });
 
   // Create a new branch
   await octokit.git.createRef({
