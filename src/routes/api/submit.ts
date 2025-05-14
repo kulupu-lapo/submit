@@ -65,7 +65,7 @@ app.post("/", async (c) => {
       env: env,
       owner: env.GITHUB_REPO.split("/")[0],
       repo: env.GITHUB_REPO.split("/")[1],
-      branch: `submission-${Date.now()}`,
+      branch: `pana/${dataPR.filename}-${Date.now()}`,
       title: `[submission] from ${dataPR["submitted-by"]}: ${frontmatter.title}`,
       filePath: filepath,
       content: `---\n${yaml.dump(frontmatter)}---\n\n${dataPR.text}`,
