@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 
-import { renderer } from "../utils/renderer";
+import { renderer } from "./utils/renderer";
 
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
@@ -9,8 +9,8 @@ import { trimTrailingSlash } from "hono/trailing-slash";
 import type { StatusCode } from "hono/utils/http-status";
 
 import dotenv from "dotenv";
-import submit from "./api/submit";
-import testEnv from "./api/test-env";
+import submit from "./routes/api/submit";
+import testEnv from "./routes/api/test-env";
 
 dotenv.config();
 
