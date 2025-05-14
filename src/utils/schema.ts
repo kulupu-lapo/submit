@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const Article = z
   .object({
-    title: z.string(),
+    title: z.string().nonempty(),
     description: z.string().nullable(),
     authors: z.array(z.string()).nullable(),
     proofreaders: z.array(z.string()).nonempty().nullable(),
