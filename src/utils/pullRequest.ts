@@ -6,6 +6,7 @@ interface pullRequestI {
   owner: string;
   repo: string;
   branch: string;
+  title: string;
   filePath: string;
   content: string;
   dryRun: boolean;
@@ -46,7 +47,7 @@ export const pullRequest = async (c: pullRequestI) => {
     owner: c.owner,
     repo: c.repo,
     path: c.filePath,
-    message: `Add YAML submission ${c.branch}`,
+    message: `Add submission ${c.branch}`,
     content: Buffer.from(c.content).toString("base64"),
     branch: c.branch,
   });
@@ -55,10 +56,10 @@ export const pullRequest = async (c: pullRequestI) => {
   const { data: pr } = await octokit.pulls.create({
     owner: c.owner,
     repo: c.repo,
-    title: `Form submission ${c.branch}`,
+    title: c.title,
     head: c.branch,
     base: "main",
-    body: "Automatically generated from form submission.",
+    body: "Automatically generated from submission form.",
   });
 
   return pr;

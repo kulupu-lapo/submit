@@ -54,6 +54,7 @@ app.post("/", async (c) => {
       owner: env.GITHUB_REPO.split("/")[0],
       repo: env.GITHUB_REPO.split("/")[1],
       branch: `submission-${Date.now()}`,
+      title: `[submission] from ${dataPR["submitted-by"]}: ${frontmatter.title}`,
       filePath: [
         "plaintext",
         frontmatter.date.getUTCFullYear(),
@@ -61,7 +62,7 @@ app.post("/", async (c) => {
         `${dataPR.filename}.yaml`,
       ].join("/"),
       content: `${yaml.dump(frontmatter)}\n---\n${dataPR.text}`,
-      dryRun: true,
+      dryRun: false,
     }),
   );
 });
