@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { cors } from 'hono/cors';
+import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { secureHeaders } from "hono/secure-headers";
@@ -11,7 +11,19 @@ import testEnv from "@/routes/api/test-env";
 import { renderer } from "@/utils/renderer";
 
 const app = new Hono()
-  .use("*", cors())
+  .use(
+    "*",
+    cors({
+      origin: (origin) => {
+        // Allow all localhost origins
+        return origin?.startsWith("http://localhost")
+          ? origin
+          : "https://submit-4gx.pages.dev";
+      },
+      allowHeaders: ["Content-Type"],
+      allowMethods: ["POST", "GET", "OPTIONS"],
+    }),
+  )
   .use("*", secureHeaders())
   .use("*", prettyJSON())
   .use("*", trimTrailingSlash())
