@@ -1,10 +1,17 @@
+import { Octokit } from "@octokit/rest";
 import { Hono } from "hono";
+
 import { renderer } from "./renderer";
 
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { secureHeaders } from "hono/secure-headers";
 import { trimTrailingSlash } from "hono/trailing-slash";
+import type { StatusCode } from "hono/utils/http-status";
+
+import dotenv from "dotenv";
+
+dotenv.config();
 
 type EnvI = {
   GITHUB_REPO: string;
@@ -37,63 +44,69 @@ app.onError((err: Error & { status?: StatusCode }, c) => {
   );
 });
 
+app.get("/api/test-env", async (c) => {
+  const env: any = c.env;
+  const repoFullName = env.GITHUB_REPO ?? process.env.GITHUB_REPO; // e.g. "youruser/yourrepo"
+  const token = env.GITHUB_TOKEN ?? process.env.GITHUB_TOKEN;
+
+  return c.json({
+    repo: repoFullName.replaceAll(/\w/g, "*"),
+    token: token.slice(0, 4),
+  });
+});
+
 app.get("/api/submit", async (c) => {
-  const body = await c.req.parseBody();
-  const repo = c.env.GITHUB_REPO;
-  const token = c.env.GITHUB_TOKEN;
+  const env: any = c.env;
+  const repoFullName = env.GITHUB_REPO ?? process.env.GITHUB_REPO; // e.g. "youruser/yourrepo"
+  const token = env.GITHUB_TOKEN ?? process.env.GITHUB_TOKEN;
 
-  const branch = `testing-${Date.now()}`;
-  const filePath = `plaintext/${branch}.yaml`;
+  return c.json({ repo: repoFullName, token: token.slice(0, 4) });
 
-  const headers = {
-    Authorization: `token ${token}`,
-    Accept: "application/vnd.github.v3+json",
-    "Content-Type": "application/json",
-  };
+  const [owner, repo] = repoFullName.split("/");
+  const branch = `submission-${Date.now()}`;
+  const filePath = `submissions/${branch}.yaml`;
+  const yamlContent = `test`;
 
-  // Get default branch SHA
-  const baseRes = await fetch(
-    `https://api.github.com/repos/${repo}/git/ref/heads/main`,
-    { headers },
-  );
-  return c.json({ success: true, data: baseRes });
-  const baseData = await baseRes.json();
-  const baseSha = baseData.object.sha;
+  const octokit = new Octokit({ auth: token });
 
-  // Create new branch
-  await fetch(`https://api.github.com/repos/${repo}/git/refs`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      ref: `refs/heads/${branch}`,
-      sha: baseSha,
-    }),
+  // Get the default branch reference
+  const { data: refData } = await octokit.git.getRef({
+    owner,
+    repo,
+    ref: "heads/main",
   });
 
-  // Create file in new branch
-  await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}`, {
-    method: "PUT",
-    headers,
-    body: JSON.stringify({
-      message: `Add YAML submission ${branch}`,
-      content: "test", // btoa(unescape(encodeURIComponent(yamlContent))),
-      branch,
-    }),
+  const baseSha = refData.object.sha;
+
+  // Create a new branch
+  await octokit.git.createRef({
+    owner,
+    repo,
+    ref: `refs/heads/${branch}`,
+    sha: baseSha,
   });
 
-  // Create Pull Request
-  const prRes = await fetch(`https://api.github.com/repos/${repo}/pulls`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      title: `Form submission ${branch}`,
-      head: branch,
-      base: "main",
-      body: "Automatically generated from form submission.",
-    }),
+  // Create file in the new branch
+  await octokit.repos.createOrUpdateFileContents({
+    owner,
+    repo,
+    path: filePath,
+    message: `Add YAML submission ${branch}`,
+    content: Buffer.from(yamlContent).toString("base64"),
+    branch,
   });
 
-  return c.json({ success: true, data: prRes.json() });
+  // Create a pull request
+  const { data: pr } = await octokit.pulls.create({
+    owner,
+    repo,
+    title: `Form submission ${branch}`,
+    head: branch,
+    base: "main",
+    body: "Automatically generated from form submission.",
+  });
+
+  return c.json(pr);
 });
 
 export default app;
