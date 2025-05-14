@@ -47,6 +47,11 @@ app.post("/", async (c) => {
     return c.json({ success: false, error: dataPRResult.error });
   const dataPR = dataPRResult.data;
 
+  // Unfortunately, dates get displayed as datetimes by default.
+  // we want just the date
+  const formattedFrontmatter: any = frontmatter;
+  formattedFrontmatter.date = frontmatter.date.toISOString().split("T")[0];
+
   const env = getEnv(c);
   return c.json(
     await pullRequest({
@@ -61,7 +66,7 @@ app.post("/", async (c) => {
         ("0" + (frontmatter.date.getUTCMonth() + 1)).slice(-2), // Date() is outstandingly stupid
         `${dataPR.filename}.yaml`,
       ].join("/"),
-      content: `${yaml.dump(frontmatter)}---\n\n${dataPR.text}`,
+      content: `${yaml.dump(formattedFrontmatter)}---\n\n${dataPR.text}`,
       dryRun: false,
     }),
   );
