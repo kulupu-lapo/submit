@@ -51,7 +51,7 @@ app.post("/", async (c) => {
     "plaintext",
     frontmatter.date.getUTCFullYear(),
     ("0" + (frontmatter.date.getUTCMonth() + 1)).slice(-2), // Date() is outstandingly stupid
-    `${dataPR.filename}.yaml`,
+    `${dataPR.filename}.md`,
   ].join("/");
 
   // Unfortunately, dates get displayed as datetimes by default.
