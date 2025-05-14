@@ -27,7 +27,13 @@ const app = new Hono()
 app.use(renderer);
 
 app.get("/", (c) => {
-  return c.render(<h1>Hello world</h1>);
+  return c.render(
+    <form method="post" action="/api/submit">
+      <input name="title" placeholder="Title" required />
+      <input name="description" placeholder="Description" required />
+      <button type="submit">Submit</button>
+    </form>,
+  );
 });
 
 app.onError((err: Error & { status?: StatusCode }, c) => {
@@ -55,7 +61,14 @@ app.get("/api/test-env", async (c) => {
   });
 });
 
-app.get("/api/submit", async (c) => {
+app.post("/api/submit", async (c) => {
+  const body = await c.req.parseBody();
+  const data = {
+    title: body.title,
+    description: body.description,
+  };
+  const yamlContent = `title: ${data.title}\ndescription: ${data.description}\n`;
+
   const env: any = c.env;
   const repoFullName = env.GITHUB_REPO ?? process.env.GITHUB_REPO; // e.g. "youruser/yourrepo"
   const token = env.GITHUB_TOKEN ?? process.env.GITHUB_TOKEN;
@@ -63,7 +76,7 @@ app.get("/api/submit", async (c) => {
   const [owner, repo] = repoFullName.split("/");
   const branch = `submission-${Date.now()}`;
   const filePath = `submissions/${branch}.yaml`;
-  const yamlContent = `test`;
+  // const yamlContent = `test`;
 
   const octokit = new Octokit({ auth: token });
 
