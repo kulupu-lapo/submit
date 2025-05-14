@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { cors } from 'hono/cors';
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { secureHeaders } from "hono/secure-headers";
@@ -10,6 +11,7 @@ import testEnv from "@/routes/api/test-env";
 import { renderer } from "@/utils/renderer";
 
 const app = new Hono()
+  .use("*", cors())
   .use("*", secureHeaders())
   .use("*", prettyJSON())
   .use("*", trimTrailingSlash())
