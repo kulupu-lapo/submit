@@ -61,7 +61,7 @@ app.post("/", async (c) => {
         ("0" + (frontmatter.date.getUTCMonth() + 1)).slice(-2), // Date() is outstandingly stupid
         `${dataPR.filename}.yaml`,
       ].join("/"),
-      content: `${yaml.dump(frontmatter)}\n---\n${dataPR.text}`,
+      content: `${yaml.dump(frontmatter)}---\n\n${dataPR.text}`,
       dryRun: false,
     }),
   );

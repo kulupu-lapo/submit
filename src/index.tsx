@@ -16,7 +16,12 @@ const app = new Hono()
     cors({
       origin: (origin) => {
         // Allow all localhost origins
-        return origin?.startsWith("http://localhost")
+        return origin?.startsWith("http://localhost") ||
+          [
+            "https://lipu.pona.la",
+            "https://lapo.pona.la",
+            "https://kulupu-lapo.github.io",
+          ].includes(origin)
           ? origin
           : "https://submit-4gx.pages.dev";
       },
