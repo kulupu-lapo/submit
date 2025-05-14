@@ -47,10 +47,16 @@ app.post("/", async (c) => {
     return c.json({ success: false, error: dataPRResult.error });
   const dataPR = dataPRResult.data;
 
+  const filepath = [
+    "plaintext",
+    frontmatter.date.getUTCFullYear(),
+    ("0" + (frontmatter.date.getUTCMonth() + 1)).slice(-2), // Date() is outstandingly stupid
+    `${dataPR.filename}.yaml`,
+  ].join("/");
+
   // Unfortunately, dates get displayed as datetimes by default.
   // we want just the date
-  const formattedFrontmatter: any = frontmatter;
-  formattedFrontmatter.date = frontmatter.date.toISOString().split("T")[0];
+  frontmatter.date = frontmatter.date.toISOString().split("T")[0];
 
   const env = getEnv(c);
   return c.json(
@@ -60,13 +66,8 @@ app.post("/", async (c) => {
       repo: env.GITHUB_REPO.split("/")[1],
       branch: `submission-${Date.now()}`,
       title: `[submission] from ${dataPR["submitted-by"]}: ${frontmatter.title}`,
-      filePath: [
-        "plaintext",
-        frontmatter.date.getUTCFullYear(),
-        ("0" + (frontmatter.date.getUTCMonth() + 1)).slice(-2), // Date() is outstandingly stupid
-        `${dataPR.filename}.yaml`,
-      ].join("/"),
-      content: `${yaml.dump(formattedFrontmatter)}---\n\n${dataPR.text}`,
+      filePath: filepath,
+      content: `${yaml.dump(frontmatter)}---\n\n${dataPR.text}`,
       dryRun: false,
     }),
   );
