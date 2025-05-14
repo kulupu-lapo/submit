@@ -12,7 +12,7 @@ app.post("/", async (c) => {
 
   let frontmatterResult = Article.safeParse({
     title: body.title,
-    description: body.description ?? null,
+    description: body.description || null,
     authors: body.authors
       ? body.authors.split(",").map((item: string) => item.trim())
       : null,
@@ -23,14 +23,14 @@ app.post("/", async (c) => {
     tags: body.tags
       ? body.tags.split(",").map((item: string) => item.trim())
       : null,
-    license: body.license ?? null,
+    license: body.license || null,
     sources: body.sources
       ? body.sources.split(",").map((item: string) => item.trim())
       : null,
     archives: null,
     preprocessing: null,
     "accessibility-notes": null,
-    notes: body.notes ?? null,
+    notes: body.notes || null,
   });
 
   if (!frontmatterResult.success)
