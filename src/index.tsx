@@ -40,11 +40,13 @@ app.onError((err: Error & { status?: StatusCode }, c) => {
   console.error(err);
   return c.json(
     {
-      ok: false as const,
-      message: err.message,
-      stack: err.stack,
-      status: err.status,
-      cause: err.cause,
+      success: false,
+      error: {
+        message: err.message,
+        stack: err.stack,
+        status: err.status,
+        cause: err.cause,
+      },
     },
     err.status ?? 500,
   );

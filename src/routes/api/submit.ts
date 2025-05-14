@@ -59,8 +59,9 @@ app.post("/", async (c) => {
   frontmatter.date = frontmatter.date.toISOString().split("T")[0];
 
   const env = getEnv(c);
-  return c.json(
-    await pullRequest({
+  return c.json({
+    success: true,
+    data: await pullRequest({
       env: env,
       owner: env.GITHUB_REPO.split("/")[0],
       repo: env.GITHUB_REPO.split("/")[1],
@@ -70,7 +71,7 @@ app.post("/", async (c) => {
       content: `${yaml.dump(frontmatter)}---\n\n${dataPR.text}`,
       dryRun: false,
     }),
-  );
+  });
 });
 
 export default app;
