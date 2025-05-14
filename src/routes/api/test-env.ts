@@ -1,5 +1,5 @@
+import { getEnv } from "@/utils/env";
 import { Hono } from "hono";
-import { getEnv } from "../../utils/env";
 
 const app = new Hono();
 

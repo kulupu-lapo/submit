@@ -1,6 +1,6 @@
+import { getEnv } from "@/utils/env";
+import { pullRequest } from "@/utils/pullRequest";
 import { Hono } from "hono";
-import { getEnv } from "../../utils/env";
-import { pullRequest } from "../../utils/pullRequest";
 
 const app = new Hono();
 

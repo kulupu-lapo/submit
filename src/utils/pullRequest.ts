@@ -1,5 +1,5 @@
+import { Env } from "@/utils/env";
 import { Octokit } from "@octokit/rest";
-import { Env } from "./env";
 
 interface pullRequestI {
   env: Env;
