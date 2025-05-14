@@ -76,8 +76,6 @@ app.get("/api/submit", async (c) => {
 
   const baseSha = refData.object.sha;
 
-  return c.json({ sha: baseSha });
-
   // Create a new branch
   await octokit.git.createRef({
     owner,
