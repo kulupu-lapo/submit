@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "@octokit/rest": "^21.1.1",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.15.17",
     "dotenv": "^16.5.0",
-    "hono": "^4.7.9"
+    "hono": "^4.7.9",
+    "js-yaml": "^4.1.0"
   },
   "devDependencies": {
     "@hono/vite-build": "^1.2.0",

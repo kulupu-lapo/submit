@@ -3,6 +3,7 @@ import { pullRequest } from "@/utils/pullRequest";
 import { requestBody } from "@/utils/request";
 import { Article } from "@/utils/schema";
 import { Hono } from "hono";
+import yaml from "js-yaml";
 
 const app = new Hono();
 
@@ -10,6 +11,7 @@ app.post("/", async (c) => {
   let body = await requestBody(c);
 
   const request = {
+    filename: body.filename,
     "submitted-by": body["submitted-by"],
     text: body.text,
     metadata: Article.parse({
@@ -36,16 +38,15 @@ app.post("/", async (c) => {
     }),
   };
 
-  return c.json(request);
-
-  const yamlContent = `title: ${request.metadata.title}\ndescription: ${request.metadata.description}\n`;
+  const content = `${yaml.dump(request.metadata)}\n---\n${request.text}`;
 
   const env = getEnv(c);
 
   const [owner, repo] = env.GITHUB_REPO.split("/");
   const branch = `submission-${Date.now()}`;
-  const filePath = `plaintext/${branch}.yaml`;
-  // const yamlContent = `test`;
+  const filePath = `plaintext/${request.metadata.date.getUTCFullYear()}/${request.metadata.date.getUTCMonth()}/${request.filename}.yaml`;
+
+  return c.json({ filePath, content });
 
   return c.json(
     await pullRequest({
@@ -54,7 +55,7 @@ app.post("/", async (c) => {
       repo: repo,
       branch: branch,
       filePath: filePath,
-      content: yamlContent,
+      content: content,
       dryRun: true,
     }),
   );
