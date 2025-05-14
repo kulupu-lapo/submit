@@ -46,27 +46,21 @@ app.post("/", async (c) => {
   if (!dataPRResult.success)
     return c.json({ success: false, error: dataPRResult.error });
   const dataPR = dataPRResult.data;
-  const content = `${yaml.dump(frontmatter)}\n---\n${dataPR.text}`;
+
   const env = getEnv(c);
-  const [owner, repo] = env.GITHUB_REPO.split("/");
-  const branch = `submission-${Date.now()}`;
-  const filePath = [
-    "plaintext",
-    frontmatter.date.getUTCFullYear(),
-    ("0" + (frontmatter.date.getUTCMonth() + 1)).slice(-2), // Date() is outstandingly stupid
-    `${dataPR.filename}.yaml`,
-  ].join("/");
-
-  return c.json({ filePath, content });
-
   return c.json(
     await pullRequest({
       env: env,
-      owner: owner,
-      repo: repo,
-      branch: branch,
-      filePath: filePath,
-      content: content,
+      owner: env.GITHUB_REPO.split("/")[0],
+      repo: env.GITHUB_REPO.split("/")[1],
+      branch: `submission-${Date.now()}`,
+      filePath: [
+        "plaintext",
+        frontmatter.date.getUTCFullYear(),
+        ("0" + (frontmatter.date.getUTCMonth() + 1)).slice(-2), // Date() is outstandingly stupid
+        `${dataPR.filename}.yaml`,
+      ].join("/"),
+      content: `${yaml.dump(frontmatter)}\n---\n${dataPR.text}`,
       dryRun: true,
     }),
   );

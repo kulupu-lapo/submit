@@ -25,7 +25,13 @@ export const pullRequest = async (c: pullRequestI) => {
 
   // Show that we're logged into Github and that the file is generate-able.
   // Everything below this point impacts state so let's not keep testing it right now.
-  if (c.dryRun) return { sha: baseSha, yaml: c.content };
+  if (c.dryRun)
+    return {
+      sha: baseSha,
+      branch: c.branch,
+      filepath: c.filePath,
+      content: c.content,
+    };
 
   // Create a new branch
   await octokit.git.createRef({
