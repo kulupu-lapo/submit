@@ -50,7 +50,12 @@ app.post("/", async (c) => {
   const env = getEnv(c);
   const [owner, repo] = env.GITHUB_REPO.split("/");
   const branch = `submission-${Date.now()}`;
-  const filePath = `plaintext/${frontmatter.date.getUTCFullYear()}/${frontmatter.date.getUTCMonth()}/${dataPR.filename}.yaml`;
+  const filePath = [
+    "plaintext",
+    frontmatter.date.getUTCFullYear(),
+    ("0" + (frontmatter.date.getUTCMonth() + 1)).slice(-2), // Date() is outstandingly stupid
+    `${dataPR.filename}.yaml`,
+  ].join("/");
 
   return c.json({ filePath, content });
 
