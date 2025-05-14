@@ -33,3 +33,9 @@ export const Article = z
     notes: z.string().nullable(),
   })
   .strict(); // reject additional fields
+
+export const DataPR = z.object({
+  filename: z.string().nonempty(),
+  "submitted-by": z.string().nonempty(),
+  text: z.string().nonempty(),
+});
