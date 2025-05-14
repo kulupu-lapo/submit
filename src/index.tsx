@@ -8,16 +8,8 @@ import { secureHeaders } from "hono/secure-headers";
 import { trimTrailingSlash } from "hono/trailing-slash";
 import type { StatusCode } from "hono/utils/http-status";
 
-import dotenv from "dotenv";
 import submit from "./routes/api/submit";
 import testEnv from "./routes/api/test-env";
-
-dotenv.config();
-
-type EnvI = {
-  GITHUB_REPO: string;
-  GITHUB_TOKEN: string;
-};
 
 const app = new Hono()
   .use("*", secureHeaders())

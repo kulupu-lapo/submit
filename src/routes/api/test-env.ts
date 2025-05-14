@@ -1,15 +1,14 @@
 import { Hono } from "hono";
+import { getEnv } from "../../utils/env";
 
 const app = new Hono();
 
 app.get("/", async (c) => {
-  const env: any = c.env;
-  const repoFullName = env.GITHUB_REPO ?? process.env.GITHUB_REPO;
-  const token = env.GITHUB_TOKEN ?? process.env.GITHUB_TOKEN;
+  const env = getEnv(c);
 
   return c.json({
-    repo: repoFullName.replaceAll(/\w/g, "*"),
-    token: token.slice(0, 4),
+    repo: env.GITHUB_REPO.replaceAll(/\w/g, "*"),
+    token: env.GITHUB_TOKEN.slice(0, 4),
   });
 });
 

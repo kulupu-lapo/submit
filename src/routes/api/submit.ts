@@ -1,5 +1,6 @@
 import { Octokit } from "@octokit/rest";
 import { Hono } from "hono";
+import { getEnv } from "../../utils/env";
 
 const app = new Hono();
 
@@ -11,16 +12,14 @@ app.post("/", async (c) => {
   };
   const yamlContent = `title: ${data.title}\ndescription: ${data.description}\n`;
 
-  const env: any = c.env;
-  const repoFullName = env.GITHUB_REPO ?? process.env.GITHUB_REPO;
-  const token = env.GITHUB_TOKEN ?? process.env.GITHUB_TOKEN;
+  const env = getEnv(c);
 
-  const [owner, repo] = repoFullName.split("/");
+  const [owner, repo] = env.GITHUB_REPO.split("/");
   const branch = `submission-${Date.now()}`;
   const filePath = `submissions/${branch}.yaml`;
   // const yamlContent = `test`;
 
-  const octokit = new Octokit({ auth: token });
+  const octokit = new Octokit({ auth: env.GITHUB_TOKEN });
 
   // Get the default branch reference
   const { data: refData } = await octokit.git.getRef({
