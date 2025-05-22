@@ -8,7 +8,12 @@ import yaml from "js-yaml";
 const app = new Hono();
 
 const arrayOf = (string: string) =>
-  string ? string.split(",").map((item: string) => item.trim()) : null;
+  string
+    ? string
+        .split(",")
+        .map((item: string) => item.trim())
+        .filter((x) => x)
+    : null;
 const nullishObj = (object: any) =>
   Object.values(object).reduce((prev, next) => {
     next != null;
