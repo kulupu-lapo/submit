@@ -7,26 +7,32 @@ import yaml from "js-yaml";
 
 const app = new Hono();
 
+const arrayOf = (string: string) =>
+  string ? string.split(",").map((item: string) => item.trim()) : null;
+const nullishObj = (object: any) =>
+  Object.values(object).reduce((prev, next) => {
+    next != null;
+  });
+
 app.post("/", async (c) => {
   let body = await requestBody(c);
 
+  let original = {
+    title: body["original-title"] || null,
+    authors: arrayOf(body["original-authors"]),
+  };
   let frontmatterResult = Article.safeParse({
     title: body.title,
     description: body.description || null,
-    authors: body.authors
-      ? body.authors.split(",").map((item: string) => item.trim())
-      : null,
+    authors: arrayOf(body.authors),
     proofreaders: null,
     date: body.date,
     "date-precision": body["date-precision"],
-    original: null,
-    tags: body.tags
-      ? body.tags.split(",").map((item: string) => item.trim())
-      : null,
+    original:
+      original.title != null || original.authors != null ? original : null,
+    tags: arrayOf(body.tags),
     license: body.license || null,
-    sources: body.sources
-      ? body.sources.split(",").map((item: string) => item.trim())
-      : null,
+    sources: arrayOf(body.sources),
     archives: null,
     preprocessing: null,
     "accessibility-notes": null,
