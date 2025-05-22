@@ -47,7 +47,7 @@ export const pullRequest = async (c: pullRequestI) => {
     owner: c.owner,
     repo: c.repo,
     path: c.filePath,
-    message: `Add submission ${c.branch}`,
+    message: c.title,
     content: Buffer.from(c.content).toString("base64"),
     branch: c.branch,
   });
